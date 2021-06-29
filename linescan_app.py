@@ -6,6 +6,12 @@ import streamlit as st
 st.set_page_config(layout="wide")
 # data input from user
 st.sidebar.header("Parameter settings")
+# front end main page
+header = st.beta_container()
+with header:
+    st.title('GPR line scan app')
+    st.text('This app helps you to visualize the GPR line scan data and measure depths from it')
+
 
 velocity = st.sidebar.number_input("Velocity [ft/ns], default dry soil",value=0.394, step=0.001,format="%.3f")
 c_vel = 0.3 * 3.28084 # ft/ns
@@ -28,27 +34,46 @@ if uploaded_file is not None:
         st.text("preview first five lines")
         st.write(df.head(5))
 
-
     if uploaded_file.name.split('.')[0][-1] == 'r':
         pos = pos[::-1]
         signal = np.fliplr(signal)
-        
-    # derived
-    La = 0.5* time * c_vel
-    L = 0.5* time* velocity
-    # kappa = (La/L)**2
-    # kappa = (c/v)**2
-        
-    # wrap data
-    scan = ScanData()
-    scan.pos = pos
-    scan.time = time
-    scan.signal = signal
-    scan.L = L
-    scan.La = La
 else:
-    st.text('file error')
-    st.stop()
+    st.text('No file found, please upload a file or')
+    if st.checkbox('use the demo data',True):
+        f = 'linex1.csv'
+        df = pd.read_csv('./data/'+f)
+        signal = df.values[2:,2:].astype(float)
+        pos = df.values[0,2:].astype(float) #ft
+        time = df.values[2:,1].astype(float) # ns
+        show_full_data = st.checkbox("check full data file", value=False)
+        if show_full_data:
+            st.write(df)
+        else:
+            st.text("preview first five lines")
+            st.write(df.head(5))
+
+        if f.split('.')[0][-1] == 'r':
+            pos = pos[::-1]
+            signal = np.fliplr(signal)
+    else:
+        st.text("'No file found, please upload a file or use the demo data")
+        st.stop()
+
+
+# derived
+La = 0.5* time * c_vel
+L = 0.5* time* velocity
+# kappa = (La/L)**2
+# kappa = (c/v)**2
+    
+# wrap data
+scan = ScanData()
+scan.pos = pos
+scan.time = time
+scan.signal = signal
+scan.L = L
+scan.La = La
+
 
 # @st.cache(allow_output_mutation=True) 
 def plot_line(scan):
@@ -71,16 +96,11 @@ def plot_line(scan):
     plt.tight_layout()
     return fig
 
-# front end main page
-header = st.beta_container()
 
 visualization = st.beta_container()
 
 
 
-with header:
-    st.title('GPR app')
-    st.text('This app helps you to visualize the GPR scan data')
     
 with visualization:
     st.header('Visualization')
@@ -90,10 +110,10 @@ with visualization:
 # show depth range
 
 add_1st_line = st.checkbox("add_line1", True)
-depth_point_1st = st.sidebar.slider('line 1 depth point', 0, len(scan.time),0,1)
+depth_point_1st = st.sidebar.slider('line 1 depth point', 0, len(scan.time),len(scan.time)//4,1)
 
 add_2nd_line = st.checkbox("add_line2", True)
-depth_point_2nd = st.sidebar.slider('line 2 depth point', 0, len(scan.time),0,1)
+depth_point_2nd = st.sidebar.slider('line 2 depth point', 0, len(scan.time),len(scan.time)//3,1)
 
 with visualization:
     st.subheader('line plot')
