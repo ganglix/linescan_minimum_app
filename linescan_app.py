@@ -43,7 +43,7 @@ if uploaded_file is not None:
         signal = np.fliplr(signal)
 else:
     st.text('To start, please upload a file or use the demo data')
-    if st.checkbox('use the demo data',True):
+    if st.checkbox('use the demo data',False):
         f = 'linex1.csv'
         df = pd.read_csv('./data/'+f)
         signal = df.values[2:,2:].astype(float)
