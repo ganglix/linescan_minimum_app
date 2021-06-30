@@ -10,7 +10,7 @@ st.sidebar.header("Parameter settings")
 header = st.beta_container()
 with header:
     st.title('GPR line scan app')
-    st.text('This app helps you to visualize the GPR line scan data and measure depths from it')
+    st.text('This app helps you visualize the GPR line scan data and measure depths from it')
 
 
 velocity = st.sidebar.number_input("Velocity [ft/ns], default dry soil",value=0.394, step=0.001,format="%.3f")
@@ -23,10 +23,14 @@ uploaded_file = st.file_uploader("Single File Uploader", accept_multiple_files=F
 class ScanData: pass
 
 if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
-    signal = df.values[2:,2:].astype(float)
-    pos = df.values[0,2:].astype(float) #ft
-    time = df.values[2:,1].astype(float) # ns
+    try:
+        df = pd.read_csv(uploaded_file)
+        signal = df.values[2:,2:].astype(float)
+        pos = df.values[0,2:].astype(float) #ft
+        time = df.values[2:,1].astype(float) # ns
+    except:
+        st.text('file format error, please refer to the demo data format')
+        st.stop()
     show_full_data = st.checkbox("check full data file", value=False)
     if show_full_data:
         st.write(df)
@@ -38,7 +42,7 @@ if uploaded_file is not None:
         pos = pos[::-1]
         signal = np.fliplr(signal)
 else:
-    st.text('No file found, please upload a file or')
+    st.text('To start, please upload a file or use the demo data')
     if st.checkbox('use the demo data',True):
         f = 'linex1.csv'
         df = pd.read_csv('./data/'+f)
@@ -56,7 +60,6 @@ else:
             pos = pos[::-1]
             signal = np.fliplr(signal)
     else:
-        st.text("'No file found, please upload a file or use the demo data")
         st.stop()
 
 
