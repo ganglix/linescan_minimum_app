@@ -125,41 +125,43 @@ with visualization:
 # show depth range
 
 with control:
-    add_1st_line = st.checkbox("add_line1", True)
-    depth_point_1st = st.slider(
-        "line 1 depth point", 0, len(scan.time), len(scan.time) // 4, 1
+    L_max = scan.L[-1]
+    L_min = scan.L[0]
+    add_line1 = st.checkbox("add line1", True)
+    line1_depth = st.slider(
+        "line 1 depth [ft]", L_min, L_max, 0., 0.001, format="%.3f"
     )
 
-    add_2nd_line = st.checkbox("add_line2", True)
-    depth_point_2nd = st.slider(
-        "line 2 depth point", 0, len(scan.time), len(scan.time) // 3, 1
+    add_line2 = st.checkbox("add line2", True)
+    line2_depth = st.slider(
+        "line 2 depth [ft]", L_min, L_max, 0., 0.001, format="%.3f"
     )
 
 with visualization:
     st.subheader("line plot")
 
     fig1 = plot_line(scan)
-    if add_1st_line:
-        fig1.axes[0].hlines(L[depth_point_1st], 0, scan.pos[-1], "r", lw=0.5)
+    if add_line1:
+        fig1.axes[0].hlines(line1_depth, 0, scan.pos[-1], "r", lw=0.5)
 
-    if add_2nd_line:
-        fig1.axes[0].hlines(L[depth_point_2nd], 0, scan.pos[-1], "b", lw=0.5)
+    if add_line2:
+        fig1.axes[0].hlines(line2_depth, 0, scan.pos[-1], "b", lw=0.5)
     st.pyplot(fig1)
 
 # show results in numbers
 col1, col2 = st.beta_columns(2)
 with col1:
     col1.subheader("line position")
-    st.text(f"line 1(Red) depth: {scan.L[depth_point_1st]:.3f} ft")
-    st.text(f"line 2(Blue) depth: {scan.L[depth_point_2nd]:.3f} ft")
+    st.text(f"line 1(Red) depth: {line1_depth:.3f} ft")
+    st.text(f"line 2(Blue) depth: {line2_depth:.3f} ft")
     st.text(
-        f"line1,2 spacing: {scan.L[depth_point_2nd]-scan.L[depth_point_1st]:.3f} ft"
+        f"line1,2 spacing: {line2_depth - line1_depth:.3f} ft"
     )
 with col2:
     col2.subheader("unit conversion ft -> mm")
     num_ft = st.number_input(
         "ft",
-        value=scan.L[depth_point_2nd] - scan.L[depth_point_1st],
+        value=line2_depth - line1_depth,
         step=0.001,
         format="%.3f",
     )
