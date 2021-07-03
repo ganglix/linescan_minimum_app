@@ -127,14 +127,22 @@ with visualization:
 with control:
     L_max = scan.L[-1]
     L_min = scan.L[0]
-    add_line1 = st.checkbox("add line1", True)
+    pos_max = scan.pos[-1]
+    pos_min = scan.pos[0]
+
+    add_line1 = st.sidebar.checkbox("add line1", True)
     line1_depth = st.slider(
         "line 1 depth [ft]", L_min, L_max, 0., 0.001, format="%.3f"
     )
 
-    add_line2 = st.checkbox("add line2", True)
+    add_line2 = st.sidebar.checkbox("add line2", True)
     line2_depth = st.slider(
         "line 2 depth [ft]", L_min, L_max, 0., 0.001, format="%.3f"
+    )
+
+    add_vertical_line = st.sidebar.checkbox("add vertical line", True)
+    vline_pos = st.slider(
+        "v line pos [ft]", pos_min, pos_max, 0., 0.001, format="%.3f"
     )
 
 with visualization:
@@ -146,6 +154,9 @@ with visualization:
 
     if add_line2:
         fig1.axes[0].hlines(line2_depth, 0, scan.pos[-1], "b", lw=0.5)
+
+    if add_vertical_line:
+        fig1.axes[0].vlines(vline_pos, 0, scan.L[-1], "m", lw=0.5)
     st.pyplot(fig1)
 
 # show results in numbers
@@ -157,6 +168,9 @@ with col1:
     st.text(
         f"line1,2 spacing: {line2_depth - line1_depth:.3f} ft"
     )
+    st.text(
+        f"vline (purple) pos: {vline_pos:.3f} ft"
+    )
 with col2:
     col2.subheader("unit conversion ft -> mm")
     num_ft = st.number_input(
@@ -166,3 +180,11 @@ with col2:
         format="%.3f",
     )
     st.text(f"{num_ft*304.8 :.1f} mm ")
+
+st.sidebar.subheader('sidebar print')
+st.sidebar.text(
+    f"line1,2 spacing: {line2_depth - line1_depth:.3f} ft"
+)
+st.sidebar.text(
+    f"vline (purple) pos: {vline_pos:.3f} ft"
+)
