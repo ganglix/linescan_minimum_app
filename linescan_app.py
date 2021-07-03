@@ -188,3 +188,17 @@ st.sidebar.text(
 st.sidebar.text(
     f"vline (purple) pos: {vline_pos:.3f} ft"
 )
+
+# save and print data points
+@st.cache(allow_output_mutation=True)
+def get_data():
+    return []
+
+if st.sidebar.button("save and print"):
+    get_data().append((vline_pos,line2_depth - line1_depth))
+
+st.sidebar.subheader("position, depth")
+st.sidebar.write(pd.DataFrame(get_data()))
+
+if st.sidebar.button("clear print"):
+    st.caching.clear_cache()
