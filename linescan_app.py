@@ -197,8 +197,8 @@ def get_data():
 if st.sidebar.button("save and print"):
     get_data().append((vline_pos,line2_depth - line1_depth))
 
-st.sidebar.subheader("position, depth")
-st.sidebar.write(pd.DataFrame(get_data()))
+st.sidebar.subheader("print out")
+st.sidebar.write(pd.DataFrame(get_data(), columns=["position[ft]","depth[ft]"]))
 
 if st.sidebar.button("clear print"):
     st.caching.clear_cache()
